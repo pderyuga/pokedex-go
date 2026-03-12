@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/pderyuga/pokedex-go/internal/pokecache"
 )
 
 type Config struct {
@@ -17,60 +19,81 @@ type Config struct {
 	} `json:"results"`
 }
 
-func commandMap(c *Config) error {
+func commandMap(config *Config, cache *pokecache.Cache) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
-	if c.Next != nil {
-		url = *c.Next
+	if config.Next != nil {
+		url = *config.Next
 	}
-	res, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	if res.StatusCode > 299 {
-		return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	}
-	if err != nil {
-		return err
+	item, ok := cache.Get(url)
+	if ok {
+		err := json.Unmarshal(item, config)
+		if err != nil {
+			return err
+		}
+	} else {
+		res, err := http.Get(url)
+		if err != nil {
+			return err
+		}
+		body, err := io.ReadAll(res.Body)
+		res.Body.Close()
+		if res.StatusCode > 299 {
+			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		}
+		if err != nil {
+			return err
+		}
+
+		err = json.Unmarshal(body, config)
+		if err != nil {
+			return err
+		}
+
+		cache.Add(url, body)
 	}
 
-	err = json.Unmarshal(body, c)
-	if err != nil {
-		return err
-	}
-
-	for _, location := range c.Results {
+	for _, location := range config.Results {
 		fmt.Println(location.Name)
 	}
 
 	return nil
 }
 
-func commandMapb(c *Config) error {
-	if c.Previous == nil {
+func commandMapb(config *Config, cache *pokecache.Cache) error {
+	url := config.Previous
+	if url == nil {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	res, err := http.Get(*c.Previous)
-	if err != nil {
-		return err
-	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	if res.StatusCode > 299 {
-		return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	}
-	if err != nil {
-		return err
+	item, ok := cache.Get(*url)
+	if ok {
+		err := json.Unmarshal(item, config)
+		if err != nil {
+			return err
+		}
+	} else {
+		res, err := http.Get(*url)
+		if err != nil {
+			return err
+		}
+		body, err := io.ReadAll(res.Body)
+		res.Body.Close()
+		if res.StatusCode > 299 {
+			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		}
+		if err != nil {
+			return err
+		}
+
+		err = json.Unmarshal(body, config)
+		if err != nil {
+			return err
+		}
+
+		cache.Add(*url, body)
 	}
 
-	err = json.Unmarshal(body, c)
-	if err != nil {
-		return err
-	}
-
-	for _, location := range c.Results {
+	for _, location := range config.Results {
 		fmt.Println(location.Name)
 	}
 

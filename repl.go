@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/pderyuga/pokedex-go/internal/pokecache"
 )
 
 func startRepl() {
 	commands := getCommands()
-	c := Config{}
+	config := Config{}
+	cache := pokecache.NewCache(60 * time.Second)
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -28,7 +32,7 @@ func startRepl() {
 				fmt.Printf("Unknown command: %s\n", firstWord)
 				continue
 			} else {
-				err := command.callback(&c)
+				err := command.callback(&config, &cache)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -48,7 +52,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(c *Config) error
+	callback    func(config *Config, cache *pokecache.Cache) error
 }
 
 func getCommands() map[string]cliCommand {
