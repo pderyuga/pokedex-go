@@ -32,7 +32,11 @@ func startRepl() {
 				fmt.Printf("Unknown command: %s\n", firstWord)
 				continue
 			} else {
-				err := command.callback(&config, &cache)
+				param := ""
+				if len(words) > 1 {
+					param = words[1]
+				}
+				err := command.callback(param, &config, &cache)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -52,7 +56,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(config *Config, cache *pokecache.Cache) error
+	callback    func(param string, config *Config, cache *pokecache.Cache) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -76,6 +80,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Explore the previous 20 locations the Pokemon world",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore <location name>",
+			description: "Explore a specific location in the Pokemon world",
+			callback:    commandExplore,
 		},
 	}
 }
