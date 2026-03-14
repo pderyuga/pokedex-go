@@ -63,7 +63,7 @@ type LocationAreaConfig struct {
 	} `json:"pokemon_encounters"`
 }
 
-func commandExplore(param string, config *Config, cache *pokecache.Cache) error {
+func commandExplore(param string, config *Config, cache *pokecache.Cache, pokedex Pokedex) error {
 	if param == "" {
 		return errors.New("you must provide a location name")
 	}

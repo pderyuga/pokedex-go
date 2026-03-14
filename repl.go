@@ -10,8 +10,16 @@ import (
 	"github.com/pderyuga/pokedex-go/internal/pokecache"
 )
 
+type Pokedex map[string]Pokemon
+
+func newPokedex() Pokedex {
+	pokedex := make(map[string]Pokemon)
+	return pokedex
+}
+
 func startRepl() {
 	commands := getCommands()
+	pokedex := newPokedex()
 	config := Config{}
 	cache := pokecache.NewCache(60 * time.Second)
 
@@ -36,7 +44,7 @@ func startRepl() {
 				if len(words) > 1 {
 					param = words[1]
 				}
-				err := command.callback(param, &config, &cache)
+				err := command.callback(param, &config, &cache, pokedex)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -56,7 +64,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(param string, config *Config, cache *pokecache.Cache) error
+	callback    func(param string, config *Config, cache *pokecache.Cache, pokedex Pokedex) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -85,6 +93,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore <location name>",
 			description: "Explore a specific location in the Pokemon world",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch <pokemon name>",
+			description: "Attempt to catch a Pokemon!",
+			callback:    commandCatch,
 		},
 	}
 }

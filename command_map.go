@@ -19,7 +19,7 @@ type Config struct {
 	} `json:"results"`
 }
 
-func commandMap(param string, config *Config, cache *pokecache.Cache) error {
+func commandMap(param string, config *Config, cache *pokecache.Cache, pokedex Pokedex) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 	if config.Next != nil {
 		url = *config.Next
@@ -59,7 +59,7 @@ func commandMap(param string, config *Config, cache *pokecache.Cache) error {
 	return nil
 }
 
-func commandMapb(param string, config *Config, cache *pokecache.Cache) error {
+func commandMapb(param string, config *Config, cache *pokecache.Cache, pokedex Pokedex) error {
 	url := config.Previous
 	if url == nil {
 		fmt.Println("you're on the first page")

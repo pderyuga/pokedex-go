@@ -6,7 +6,7 @@ import (
 	"github.com/pderyuga/pokedex-go/internal/pokecache"
 )
 
-func commandHelp(param string, config *Config, cache *pokecache.Cache) error {
+func commandHelp(param string, config *Config, cache *pokecache.Cache, pokedex Pokedex) error {
 	commands := getCommands()
 
 	fmt.Println("Welcome to the Pokedex!")
