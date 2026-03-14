@@ -7,7 +7,7 @@ import (
 	"github.com/pderyuga/pokedex-go/internal/pokecache"
 )
 
-func CommandInspect(param string, config *Config, cache *pokecache.Cache, pokedex Pokedex) error {
+func commandInspect(param string, config *Config, cache *pokecache.Cache, pokedex Pokedex) error {
 	if param == "" {
 		return errors.New("you must provide a pokemon name")
 	}

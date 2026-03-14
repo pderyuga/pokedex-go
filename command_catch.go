@@ -375,6 +375,7 @@ func commandCatch(param string, config *Config, cache *pokecache.Cache, pokedex 
 
 	if randomNumber >= pokemonExperience {
 		fmt.Printf("%s was caught!\n", param)
+		fmt.Println("You may now inspect it with the inspect command.")
 		pokedex[param] = pokemon
 	} else {
 		fmt.Printf("%s got away! Better luck next time!\n", param)
